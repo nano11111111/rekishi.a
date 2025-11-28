@@ -1,767 +1,863 @@
-import React, { useState, useEffect } from 'react';
-import { BookOpen, CheckCircle, XCircle, RefreshCw, Award, ChevronRight, HelpCircle, ArrowLeft, Sword, Crown, Scroll, User, Sparkles, MessageCircle } from 'lucide-react';
-
-// 問題データ
-const questionsData = [
-  {
-    id: 1,
-    category: "弥生時代",
-    year: "12 追試",
-    question: "弥生時代の遺跡や遺物には戦争とのかかわりを示すものが見られるが，そのことに関して述べた文として正しいものを選べ。",
-    options: [
-      "北陸から東北にかけての沿岸部に，朝鮮式山城が築かれた。",
-      "石鏃は，弥生時代以後，武器として用いられなかった。",
-      "周囲に濠や土塁をめぐらす集落が現れた。",
-      "銅剣・銅矛・銅戈は，中国や朝鮮では本来，祭器として製作された。"
-    ],
-    answer: 2,
-    explanation: "【正解：③】\n弥生時代には、戦乱に備えて周囲に深い濠（ほり）や土塁をめぐらせた「環濠集落」（吉野ヶ里遺跡など）や、防御に有利な山頂につくられた「高地性集落」が現れました。\n\n【他の選択肢】\n① 誤り。朝鮮式山城は、古墳時代（飛鳥時代）に唐・新羅の侵攻に備えて築かれたものです。\n② 誤り。石鏃（石の矢じり）は、金属器が伝来した後も弥生時代を通じて武器として使用されました。\n④ 誤り。銅剣・銅矛などの青銅製武器は、大陸（中国・朝鮮）では実用武器でしたが、日本に伝わってからは大型化し、祭器（祭りの道具）として使われるようになりました。"
-  },
-  {
-    id: 2,
-    category: "鎌倉時代",
-    year: "09 追試",
-    question: "鎌倉時代の社会や経済の動向について述べた文として正しいものを選べ。",
-    options: [
-      "鎌倉幕府は，貨幣を入手するために元に天龍寺船を送った。",
-      "遠隔地の取引を決済するために，為替が用いられるようになった。",
-      "農民は徳政を要求して，しばしば幕府への大規模な実力行使を起こした。",
-      "鎌倉幕府は，しばしば撰銭令を出して貨幣の流通を統制しようとした。"
-    ],
-    answer: 1,
-    explanation: "【正解：②】\n遠隔地間の取引において、銭貨の輸送の手間や危険を避けるために、「為替（さいふ/かわせ）」という手形を用いた決済（信用取引）が行われるようになりました。\n\n【他の選択肢】\n① 誤り。天龍寺船は、室町時代に足利尊氏が後醍醐天皇の冥福を祈る天龍寺の造営費を得るために派遣したものです。\n③ 誤り。農民が徳政を要求して大規模な実力行使（土一揆）を起こすのは、主に室町時代（正長の土一揆など）です。\n④ 誤り。撰銭令（悪銭を嫌い良銭を選ぶ行為の制限）を頻繁に出したのは、室町幕府や戦国大名です。"
-  },
-  {
-    id: 3,
-    category: "鎌倉時代",
-    year: "12 本試",
-    question: "鎌倉時代後半の人々の活動について述べた文として正しいものを選べ。",
-    options: [
-      "幕府や荘園領主の支配に抵抗する者が，悪党とよばれた。",
-      "足軽が鉄砲隊に組織され，活躍した。",
-      "都市鎌倉では，大原女などの女性商人が活躍した。",
-      "交通の要所では，商品の中継ぎや運送を行う借上が現れた。"
-    ],
-    answer: 0,
-    explanation: "【正解：①】\n鎌倉時代後半、幕府や荘園領主の支配に抵抗し、年貢を奪うなどの活動を行った新興の武士や名主層などは「悪党」とよばれました（楠木正成などが有名）。\n\n【他の選択肢】\n② 誤り。足軽が鉄砲隊として活躍するのは、戦国時代以降です（鉄砲伝来は1543年）。\n③ 誤り。大原女（おはらめ）は京都近郊の大原から薪などを売りに来た女性商人であり、鎌倉ではありません。\n④ 誤り。交通の要所（港など）で商品の中継ぎや運送、保管を行ったのは「問丸（といまる）」です。「借上（かしあげ）」は金融業者（高利貸し）です。"
-  },
-  {
-    id: 4,
-    category: "室町時代",
-    year: "15 追試",
-    question: "室町時代の財政・経済について述べた文として【誤っているもの】を選べ。",
-    options: [
-      "幕府は，諸国に段銭を課して財政基盤を強めた。",
-      "幕府は，高利貸を営む土倉や酒屋への課税を行った。",
-      "幕府は，御家人の所領の質入れや売買を禁止する徳政令を発布した。",
-      "幕府は，貨幣を使った取引の円滑化をはかるため，撰銭令を制定した。"
-    ],
-    answer: 2,
-    explanation: "【正解：③（誤っている記述）】\n御家人の所領の質入れや売買を禁止する徳政令（永仁の徳政令など）を発布したのは「鎌倉幕府」です。室町幕府の徳政令は、土一揆などの要求により、債権・債務の破棄（借金の帳消し）を命じたものです。\n\n【他の選択肢】\n① 正しい。室町幕府は、守護を通して田地（段別）に課税する「段銭」を徴収しました。\n② 正しい。高利貸しを営む土倉・酒屋に対して営業税（土倉役・酒屋役）を課しました。\n④ 正しい。悪銭の増加に伴う経済混乱を防ぐため、撰銭令を出しました。"
-  },
-  {
-    id: 5,
-    category: "中世の経済",
-    year: "09 追試",
-    question: "空欄 [ ア ]・[ イ ] に入る語句の組合せとして正しいものを選べ。\n「荘園からの年貢の保管・運送などに当たっていた [ ア ] が，しだいに商業活動にも従事するようになった。…鎌倉時代には大陸から大量の [ イ ] などが輸入され，広く流通した。」",
-    options: [
-      "ア：借上　　イ：宋銭",
-      "ア：借上　　イ：明銭",
-      "ア：問丸　　イ：宋銭",
-      "ア：問丸　　イ：明銭"
-    ],
-    answer: 2,
-    explanation: "【正解：③】\nア（問丸）：荘園からの年貢の保管・運送にあたっていたのは「問丸」です。彼らは次第に商人化していきました。借上は金融業者です。\nイ（宋銭）：鎌倉時代に平清盛の日宋貿易などを通じて大量に輸入され、流通したのは「宋銭」です。明銭（永楽通宝など）が多く流通するのは室町時代です。"
-  },
-  {
-    id: 6,
-    category: "中世の経済",
-    year: "11 本試",
-    question: "中世における経済・産業の展開について述べた文として【誤っているもの】を選べ。",
-    options: [
-      "多収穫が見込める大唐米が普及した。",
-      "蝦夷地の産物が俵物として長崎から輸出された。",
-      "連雀商人などが各地で行商をした。",
-      "酒屋・土倉が高利貸を行った。"
-    ],
-    answer: 1,
-    explanation: "【正解：②（誤っている記述）】\n蝦夷地の海産物（いりこ・ほしあわび・ふかのひれ）が「俵物（たわらもの）」として長崎から中国（清）へ輸出されたのは、「江戸時代」の中期以降です。中世の話ではありません。\n\n【他の選択肢】\n① 正しい。鎌倉・室町期には、日照りに強く多収穫の大唐米（赤米）が伝来し、西日本を中心に普及しました。\n③ 正しい。連雀商人（れんじゃくしょうにん）や振売などの行商人が活動しました。\n④ 正しい。酒屋や土倉は、元手となる資本を持っていたため、金融業（高利貸し）も営みました。"
-  },
-  {
-    id: 7,
-    category: "江戸時代",
-    year: "12 本試",
-    question: "X・Yの文に関係の深い地名a～dの組合せとして正しいものを選べ。\nX：江戸時代には，米の増産をはかるために，商人資本を活用して開発が行われた。\nY：江戸時代の街道には，宿駅や関所などの施設が設けられた。\n(a:銀座, b:新田, c:大湊, d:一里塚)",
-    options: [
-      "X－a　　Y－c",
-      "X－a　　Y－d",
-      "X－b　　Y－c",
-      "X－b　　Y－d"
-    ],
-    answer: 3,
-    explanation: "【正解：④】\nX（b 新田）：江戸時代、商人資本（町人請負新田）などを活用して盛んに行われた米の増産事業による開発地は「新田」です（例：鴻池善右衛門による河内木綿の新田開発など）。\nY（d 一里塚）：江戸時代の街道（五街道など）に整備されたのは、距離の目安となる「一里塚」や、宿駅（本陣・脇本陣・旅籠屋）です。「大湊」は伊勢湾の港町、「銀座」は銀貨鋳造所です。"
-  },
-  {
-    id: 8,
-    category: "江戸時代",
-    year: "09 本試",
-    question: "（機織り作業場の図版問題）図についての説明として【誤っているもの】を選べ。",
-    options: [
-      "織物を生産する織屋の作業場が描かれている。",
-      "腰かけにすわり，足踏みして布を織る高機が使われている。",
-      "糸繰りから機織りの作業まで，分業体制がとられている。",
-      "この作業場での生産のあり方は，問屋制家内工業とよばれている。"
-    ],
-    answer: 3,
-    explanation: "【正解：④（誤っている記述）】\nこの図は、広い作業場に複数の織機を置き、人を雇って分業で生産を行っている様子、すなわち「工場制手工業（マニュファクチュア）」を描いています。「問屋制家内工業」は、問屋が原料や道具を農家に貸し与え、農家が自宅で生産を行う形態を指すため誤りです。\n\n【他の選択肢】\n図中には「高機（たかばた）」を用いている様子や、糸繰り・機織りの分業の様子が描かれています。"
-  },
-  {
-    id: 9,
-    category: "江戸時代",
-    year: "17 本試",
-    question: "経済先進地であった近世の上方について述べた文として正しいものを選べ。",
-    options: [
-      "京都の豪商である末次平蔵は，富士川や賀茂川の整備を行った。",
-      "元禄期には大坂堂島の十組問屋が，幕府に公認された。",
-      "上方で生産された醬油が，幕末まで江戸の市場を独占した。",
-      "蝦夷地や日本海側の産物が，北前船で上方へ運ばれた。"
-    ],
-    answer: 3,
-    explanation: "【正解：④】\n西廻り航路が整備されると、「北前船（きたまえぶね）」が蝦夷地（昆布・鰊など）や日本海側の産物を、下関を回って瀬戸内海経由で上方（大坂）へ運びました。\n\n【他の選択肢】\n① 誤り。富士川や高瀬川などの水路を開削したのは角倉了以です。末次平蔵は長崎の貿易商（代官）です。\n② 誤り。大坂堂島の十組問屋が幕府に公認されたのは江戸中期以降（享保期など）です。\n③ 誤り。江戸時代前期は上方の醤油（下り醤油）が優勢でしたが、後期になると関東の野田・銚子の「地廻り醤油」が江戸市場を独占するようになりました。"
-  },
-  {
-    id: 10,
-    category: "江戸時代",
-    year: "12 本試",
-    question: "19世紀前半の経済に関して述べた文a～dについて，正しいものの組合せを選べ。\na：商品経済の発達とともに，在郷商人の活動がさかんになった。\nb：商品経済の発達とともに，札差とよばれる村役人の金融活動がさかんになった。\nc：質流れにより，土地を大規模に集積する地主が現れた。\nd：質流れにより，領地を集積する旗本・御家人が増えた。",
-    options: [
-      "a・c",
-      "a・d",
-      "b・c",
-      "b・d"
-    ],
-    answer: 0,
-    explanation: "【正解：① (a・c)】\na 正しい。商品経済の浸透に伴い、農村部で商売を行う「在郷商人」が台頭しました。\nc 正しい。貨幣経済の浸透で困窮した農民が土地を手放し（質流れ）、それを集積した「寄生地主」が現れました。\n\n【誤りの選択肢】\nb 誤り。「札差（ふださし）」は、江戸の浅草に拠点を置き、旗本・御家人の蔵米の受け取りや販売、金融を行った業者です。村役人ではありません。\nd 誤り。旗本・御家人は固定収入（米）に依存していたため、物価上昇で困窮し、借金に苦しんでいました。"
-  },
-  {
-    id: 11,
-    category: "江戸時代",
-    year: "08 本試",
-    question: "近世の産業について述べた文X・Yと，その産物a～dとの組合せとして正しいものを選べ。\nX：九十九里浜で地引網により捕獲されて，綿作などの肥料に加工された。\nY：阿波国（徳島県）でさかんに栽培されて，木綿などの染料に加工された。\n(a:鰊(ニシン), b:鰯(イワシ), c:藍(アイ), d:櫨(ハゼ))",
-    options: [
-      "X－a　　Y－c",
-      "X－a　　Y－d",
-      "X－b　　Y－c",
-      "X－b　　Y－d"
-    ],
-    answer: 2,
-    explanation: "【正解：③】\nX（b 鰯）：九十九里浜などの地引網漁で大量に捕獲され、干鰯（ほしか）や〆粕に加工されて金肥（商品肥料）となったのは「鰯（いわし）」です。鰊（にしん）は蝦夷地（北海道）の特産です。\nY（c 藍）：阿波国（徳島県）で盛んに栽培され、木綿の染料となったのは「藍（あい）」です。櫨（はぜ）は木蝋の原料で、薩摩藩などが有名です。"
-  },
-  {
-    id: 12,
-    category: "江戸時代",
-    year: "14 本試",
-    question: "近世の庶民生活にかかわる諸産業に関して述べた文として正しいものを選べ。",
-    options: [
-      "九十九里浜では鰊漁，土佐では鰯漁などがさかんに行われた。",
-      "瀬戸内海沿岸を中心に，入浜式塩田（入浜塩田）が発達した。",
-      "刈敷や草木灰が，金肥として普及した。",
-      "灘の醤油，阿波の紅花などの特産品が全国各地に生まれた。"
-    ],
-    answer: 1,
-    explanation: "【正解：②】\n瀬戸内海沿岸などでは、干満の差を利用した「入浜塩田」による製塩業が発達しました。\n\n【他の選択肢】\n① 誤り。九十九里浜は鰯漁、蝦夷地が鰊漁です。\n③ 誤り。刈敷や草木灰は自給肥料です。金肥として普及したのは、干鰯・油粕などの購入肥料です。\n④ 誤り。灘・伏見は「酒」の名産地です。醤油は野田・銚子、紅花は出羽（山形）が有名です。"
-  },
-  {
-    id: 13,
-    category: "明治時代",
-    year: "17 本試",
-    question: "明治期の工業に関する文X・Yと，場所a～dとの組合せとして正しいものを選べ。\nX：三菱に払い下げられたこの地の造船所は…日清戦争後の日本の造船業を牽引した。\nY：八幡製鉄所は，この地から産出する鉄鉱石を原材料として利用した。\n(a:兵庫, b:長崎, c:大冶, d:筑豊)",
-    options: [
-      "X－a　　Y－c",
-      "X－a　　Y－d",
-      "X－b　　Y－c",
-      "X－b　　Y－d"
-    ],
-    answer: 2,
-    explanation: "【正解：③】\nX（b 長崎）：三菱に払い下げられ、造船業の中心となったのは官営の「長崎造船所」です。\nY（c 大冶）：八幡製鉄所は、筑豊炭田の石炭と、中国の「大冶（タイヤ）」鉄山の鉄鉱石を利用して操業を開始しました。"
-  },
-  {
-    id: 14,
-    category: "明治時代",
-    year: "02 本試",
-    question: "産業革命期の農村に関して述べた文として【誤っているもの】を選べ。",
-    options: [
-      "地主は，小作料として得た収入を，さまざまな企業の株式に投資するようになり，資本主義経済との結びつきを強めた。",
-      "製糸業の発展につれて繭の輸入が増大したため，養蚕業は衰退した。",
-      "都市人口の増加に対応して米価が上昇し，この時期に米の生産も増大した。",
-      "鉱工業の発展は公害問題を発生させ，足尾銅山の鉱毒被害に対して，田中正造は被害民の救済を求めて天皇への直訴を試みた。"
-    ],
-    answer: 1,
-    explanation: "【正解：②（誤っている記述）】\n明治期、製糸業の発展に伴い、その原料である「繭」の生産（養蚕業）は大いに発展しました。繭を輸入したのではなく、生糸（および絹製品）が当時の日本の主要な輸出品でした。\n\n【他の選択肢】\n① 正しい。寄生地主は小作料収入を株式投資などに回し、資本主義経済の一翼を担いました。\n③ 正しい。都市への人口流入で米の需要が増え、価格が上昇し、土地改良や品種改良で生産も増大しました。\n④ 正しい。足尾銅山鉱毒事件と田中正造の直訴は、明治期の公害問題の代表例です。"
-  },
-  {
-    id: 15,
-    category: "明治時代",
-    year: "11 本試",
-    question: "1880年代後半から1890年代の企業勃興に関して述べた文として【誤っているもの】を選べ。",
-    options: [
-      "民営の鉄道会社がいくつも生まれた。",
-      "多くの紡績会社が設立された。",
-      "コンツェルンの形態による企業の結合が広く見られた。",
-      "一部の工業分野で機械制による生産が広まった。"
-    ],
-    answer: 2,
-    explanation: "【正解：③（誤っている記述）】\n「コンツェルン（持株会社による多角的企業支配）」という形態が確立・普及するのは、第一次世界大戦後から昭和初期にかけてです。1880～90年代は「財閥」の形成期ですが、コンツェルン形態が「広く見られた」とするのは時期尚早です。\n\n【他の選択肢】\n①②④は、企業勃興（1886年頃～）および日清戦後の経営ブーム（1896年頃～）における正しい記述です（日本鉄道会社、大阪紡績会社など）。"
-  },
-  {
-    id: 16,
-    category: "明治時代",
-    year: "10 追試",
-    question: "紡績業に関して述べた文a～dについて，正しいものの組合せを選べ。\na：松方財政の開始以前から，綿糸の生産高が輸入高を上回っていた。\nb：日清戦争ののち数年間，戦争以前に比べて綿糸の輸出高が急増した。\nc：日露戦争ののち，綿糸の生産高は増加傾向にあった。\nd：関税自主権の完全回復にともない，綿糸の輸出高が輸入高を上回るようになった。",
-    options: [
-      "a・c",
-      "a・d",
-      "b・c",
-      "b・d"
-    ],
-    answer: 2,
-    explanation: "【正解：③ (b・c)】\nb 正しい。日清戦争（1894-95）の後、輸出高が急激に伸び、1897年頃に輸入高を上回って純輸出国になっています。\nc 正しい。日露戦争（1904-05）の後も、生産高は右肩上がりで増加しています。\n\n【誤りの選択肢】\na 誤り。松方財政以前（1880年代初頭）は、輸入が生産を上回っています（輸入超過）。\nd 誤り。綿糸の輸出が輸入を上回るのは1897年頃であり、関税自主権の回復（1911年）よりはるか前です。"
-  },
-  {
-    id: 17,
-    category: "大正時代",
-    year: "05 本試",
-    question: "1910年代の工業の発展に関して述べた文X～Zについて，その正誤の組合せとして正しいものを選べ。\nX：猪苗代～東京間の長距離送電に成功した。\nY：工業生産額が大幅に増大し，農業生産額を上回った。\nZ：重化学工業生産額が大幅に増大し，軽工業生産額を上回った。",
-    options: [
-      "X 正　Y 正　Z 誤",
-      "X 正　Y 誤　Z 正",
-      "X 誤　Y 正　Z 誤",
-      "X 誤　Y 誤　Z 正"
-    ],
-    answer: 0,
-    explanation: "【正解：①】\nX 正しい。1914年（大正3年）、猪苗代水力発電所から東京への長距離送電が成功しました。\nY 正しい。第一次世界大戦の好景気（大戦景気）により工業が飛躍的に発展し、1918年頃に工業生産額が農業生産額を上回りました。\nZ 誤り。重化学工業の生産額が軽工業（繊維など）を上回るのは、1930年代（昭和初期）の軍需産業化が進んでからです。1910年代はまだ軽工業が中心でした。"
-  },
-  {
-    id: 18,
-    category: "昭和時代",
-    year: "13 本試",
-    question: "1930年代の経済状況や経済政策に関して述べた文a～dについて，正しいものの組合せを選べ。\na：昭和恐慌によって困窮した農家から欠食児童や女子の身売りが続出して，深刻な社会問題となった。\nb：昭和恐慌による急激なインフレーションを抑制するため，政府は経済安定九原則を発表した。\nc：政府は，国家総動員法に基づいて価格等統制令を公布して公定価格を定め，経済統制を強化した。\nd：政府は，日中戦争における占領地の経済開発のため，日本の紡績企業に在華紡とよばれる国策会社を設立させた。",
-    options: [
-      "a・c",
-      "a・d",
-      "b・c",
-      "b・d"
-    ],
-    answer: 0,
-    explanation: "【正解：① (a・c)】\na 正しい。昭和恐慌（1930年～）により農村は疲弊し、欠食児童や「娘の身売り」が社会問題化しました。\nc 正しい。日中戦争の勃発（1937年）後、国家総動員法（1938年）に基づき、価格等統制令（1939年）を出して公定価格制を導入しました。\n\n【誤りの選択肢】\nb 誤り。経済安定九原則（ドッジ・ラインにつながる）は、第二次世界大戦後の1948年にGHQの指令で出されたインフレ収束策です。\nd 誤り。「在華紡（ざいかぼう）」は、第一次大戦後、日本の紡績会社が中国の安い労働力や市場を求めて独自に進出した現地法人の総称であり、国策会社ではありません。"
-  },
-  {
-    id: 19,
-    category: "昭和時代",
-    year: "14 本試",
-    question: "第一次世界大戦後の日本経済について述べた文として正しいものを選べ。",
-    options: [
-      "金融恐慌に際して，モラトリアム（支払猶予令）が発せられたが，恐慌は沈静化しなかった。",
-      "鈴木商店が経営破綻し，これに巨額の融資を行っていた台湾銀行が経営危機におちいった。",
-      "首相の失言をきっかけに，銀行への取付け騒ぎがおこり，昭和恐慌がはじまった。",
-      "浜口雄幸内閣が断行した金解禁の結果，輸出が増大して景気が回復した。"
-    ],
-    answer: 1,
-    explanation: "【正解：②】\n1927年の金融恐慌では、総合商社の鈴木商店が破綻し、同社に巨額融資をしていた台湾銀行が経営危機（休業）におちいりました。\n\n【他の選択肢】\n① 誤り。高橋是清蔵相によるモラトリアム（支払猶予令）の実施により、取り付け騒ぎは沈静化し、恐慌は収束しました。\n③ 誤り。片岡直温蔵相の失言で始まったのは「金融恐慌（1927）」です。「昭和恐慌（1930）」は、浜口内閣の金解禁が世界恐慌と重なったことで起きました。\n④ 誤り。浜口雄幸内閣による金解禁は、世界恐慌の直撃を招き、輸出が激減して日本経済は深刻な不況（昭和恐慌）に陥りました。"
-  },
-  {
-    id: 20,
-    category: "戦後",
-    year: "00 本試",
-    question: "高度経済成長期以降の農村・農業について述べた文として【誤っているもの】を選べ。",
-    options: [
-      "農家は所得水準を上昇させたが，それは農業以外の収入の増加によるところが大きい。",
-      "アメリカなどの要求にもかかわらず農産物輸入の自由化が実施されなかったため，食糧自給率が高まった。",
-      "青年層の離村が激しくなり，農業従事者の老齢化が深刻な問題となった。",
-      "家電製品や乗用車の普及にみられる消費革命は，農村でも急速に進行した。"
-    ],
-    answer: 1,
-    explanation: "【正解：②（誤っている記述）】\n1961年の農業基本法制定以降、畜産物や果樹などの選択的拡大が進められましたが、飼料穀物や小麦などの農産物輸入は自由化・拡大されました。その結果、日本の食糧自給率は大幅に「低下」しました。\n\n【他の選択肢】\n① 正しい。農業所得の伸び悩みに対し、兼業（会社勤めなど）による農外所得が増加しました。\n③ 正しい。若者の都市流出により、農村では過疎化と農業従事者の高齢化が進みました。\n④ 正しい。農村でも生活様式の近代化が進み、家電や自動車が普及しました。"
-  }
-];
-
-// ランク定義
-const RANK_TITLES = [
-  { threshold: 0, title: "農民", icon: "🌱" },
-  { threshold: 4, title: "足軽", icon: "🦶" },
-  { threshold: 8, title: "武士", icon: "⚔️" },
-  { threshold: 12, title: "大名", icon: "🏯" },
-  { threshold: 16, title: "老中", icon: "📜" },
-  { threshold: 20, title: "天下人", icon: "👑" },
-];
-
-// 軍師のセリフ集
-const GUIDE_QUOTES = {
-  correct: [
-    "見事じゃ！その調子で進むがよい！",
-    "うむ、正解じゃ。よくぞ見抜いた！",
-    "天晴れ！歴史の流れがよく見えておる。",
-    "その通り！勝利への道が開けたな。",
-    "やるではないか！次の戦いも期待しておるぞ。"
-  ],
-  incorrect: [
-    "無念…！だが、ここが踏ん張りどころじゃ。",
-    "惜しかったな。だが敗北から学ぶことこそ多し。",
-    "むむっ、間違ったか。解説を読み、知略を磨くのじゃ！",
-    "焦るでない。歴史は一日にして成らず、じゃ。",
-    "次は必ず当てるのじゃ！解説をよく見るのだぞ。"
-  ]
-};
-
-export default function HistoryQuizApp() {
-  const [mode, setMode] = useState('menu'); // menu, practice, list, weakness
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState({});
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [shuffledQuestions, setShuffledQuestions] = useState([]);
-  const [score, setScore] = useState(0);
-  const [quizFinished, setQuizFinished] = useState(false);
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日本史B 社会経済史 演習</title>
   
-  // 新機能用ステート
-  const [wrongQuestions, setWrongQuestions] = useState([]); // 間違えた問題IDのリスト
-  const [guideMessage, setGuideMessage] = useState(""); // 軍師のセリフ
-
-  // 現在のランクを計算
-  const getCurrentRank = (currentScore) => {
-    return [...RANK_TITLES].reverse().find(r => currentScore >= r.threshold) || RANK_TITLES[0];
-  };
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   
-  const currentRank = getCurrentRank(score);
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  useEffect(() => {
-    // 初期化時に問題をシャッフルしてセット（初回のみ）
-  }, []);
+  <!-- Google Fonts (雰囲気作りのためフォントを追加) -->
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-  const resetQuiz = (targetQuestions = questionsData) => {
-    const processedQuestions = targetQuestions.map(q => {
-      // 1. シャッフル前の準備：選択肢と元のインデックスをペアにする
-      const optionsWithIndex = q.options.map((opt, i) => ({ opt, originalIndex: i }));
+  <style>
+    body {
+      font-family: 'Zen Maru Gothic', sans-serif;
+    }
+    /* アニメーション用 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-stone-100 text-stone-800">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // --- Lucide Icons Components (SVG) ---
+    // CDNのlucide-reactは環境によって扱いが難しいため、SVGコンポーネントとして直接定義します。
+    
+    const IconBase = ({ children, className, ...props }) => (
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="24" 
+        height="24" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        className={className} 
+        {...props}
+      >
+        {children}
+      </svg>
+    );
+
+    const BookOpen = (props) => (
+      <IconBase {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></IconBase>
+    );
+    const CheckCircle = (props) => (
+      <IconBase {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></IconBase>
+    );
+    const XCircle = (props) => (
+      <IconBase {...props}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></IconBase>
+    );
+    const RefreshCw = (props) => (
+      <IconBase {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></IconBase>
+    );
+    const Award = (props) => (
+      <IconBase {...props}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></IconBase>
+    );
+    const ChevronRight = (props) => (
+      <IconBase {...props}><polyline points="9 18 15 12 9 6"/></IconBase>
+    );
+    const HelpCircle = (props) => (
+      <IconBase {...props}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></IconBase>
+    );
+    const ArrowLeft = (props) => (
+      <IconBase {...props}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></IconBase>
+    );
+    const Sword = (props) => (
+      <IconBase {...props}><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></IconBase>
+    );
+    const Crown = (props) => (
+      <IconBase {...props}><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></IconBase>
+    );
+    const Scroll = (props) => (
+      <IconBase {...props}><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><path d="M22 18c0 .6-.4 1-1 1h-2a2 2 0 0 1-2-2v-4.5"/><path d="M8 2h4"/><path d="M16 10c0 .6.4 1 1 1h2a2 2 0 0 1 2 2v2.5"/><path d="M13 2c0 2-3 3-3 3"/></IconBase>
+    );
+    const User = (props) => (
+      <IconBase {...props}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></IconBase>
+    );
+    const Sparkles = (props) => (
+      <IconBase {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 5H5"/><path d="M19 17v4"/><path d="M21 19h-4"/></IconBase>
+    );
+
+
+    // --- データ定義 ---
+
+    const questionsData = [
+      {
+        id: 1,
+        category: "弥生時代",
+        year: "12 追試",
+        question: "弥生時代の遺跡や遺物には戦争とのかかわりを示すものが見られるが，そのことに関して述べた文として正しいものを選べ。",
+        options: [
+          "北陸から東北にかけての沿岸部に，朝鮮式山城が築かれた。",
+          "石鏃は，弥生時代以後，武器として用いられなかった。",
+          "周囲に濠や土塁をめぐらす集落が現れた。",
+          "銅剣・銅矛・銅戈は，中国や朝鮮では本来，祭器として製作された。"
+        ],
+        answer: 2,
+        explanation: "【正解：③】\n弥生時代には、戦乱に備えて周囲に深い濠（ほり）や土塁をめぐらせた「環濠集落」（吉野ヶ里遺跡など）や、防御に有利な山頂につくられた「高地性集落」が現れました。\n\n【他の選択肢】\n① 誤り。朝鮮式山城は、古墳時代（飛鳥時代）に唐・新羅の侵攻に備えて築かれたものです。\n② 誤り。石鏃（石の矢じり）は、金属器が伝来した後も弥生時代を通じて武器として使用されました。\n④ 誤り。銅剣・銅矛などの青銅製武器は、大陸（中国・朝鮮）では実用武器でしたが、日本に伝わってからは大型化し、祭器（祭りの道具）として使われるようになりました。"
+      },
+      {
+        id: 2,
+        category: "鎌倉時代",
+        year: "09 追試",
+        question: "鎌倉時代の社会や経済の動向について述べた文として正しいものを選べ。",
+        options: [
+          "鎌倉幕府は，貨幣を入手するために元に天龍寺船を送った。",
+          "遠隔地の取引を決済するために，為替が用いられるようになった。",
+          "農民は徳政を要求して，しばしば幕府への大規模な実力行使を起こした。",
+          "鎌倉幕府は，しばしば撰銭令を出して貨幣の流通を統制しようとした。"
+        ],
+        answer: 1,
+        explanation: "【正解：②】\n遠隔地間の取引において、銭貨の輸送の手間や危険を避けるために、「為替（さいふ/かわせ）」という手形を用いた決済（信用取引）が行われるようになりました。\n\n【他の選択肢】\n① 誤り。天龍寺船は、室町時代に足利尊氏が後醍醐天皇の冥福を祈る天龍寺の造営費を得るために派遣したものです。\n③ 誤り。農民が徳政を要求して大規模な実力行使（土一揆）を起こすのは、主に室町時代（正長の土一揆など）です。\n④ 誤り。撰銭令（悪銭を嫌い良銭を選ぶ行為の制限）を頻繁に出したのは、室町幕府や戦国大名です。"
+      },
+      {
+        id: 3,
+        category: "鎌倉時代",
+        year: "12 本試",
+        question: "鎌倉時代後半の人々の活動について述べた文として正しいものを選べ。",
+        options: [
+          "幕府や荘園領主の支配に抵抗する者が，悪党とよばれた。",
+          "足軽が鉄砲隊に組織され，活躍した。",
+          "都市鎌倉では，大原女などの女性商人が活躍した。",
+          "交通の要所では，商品の中継ぎや運送を行う借上が現れた。"
+        ],
+        answer: 0,
+        explanation: "【正解：①】\n鎌倉時代後半、幕府や荘園領主の支配に抵抗し、年貢を奪うなどの活動を行った新興の武士や名主層などは「悪党」とよばれました（楠木正成などが有名）。\n\n【他の選択肢】\n② 誤り。足軽が鉄砲隊として活躍するのは、戦国時代以降です（鉄砲伝来は1543年）。\n③ 誤り。大原女（おはらめ）は京都近郊の大原から薪などを売りに来た女性商人であり、鎌倉ではありません。\n④ 誤り。交通の要所（港など）で商品の中継ぎや運送、保管を行ったのは「問丸（といまる）」です。「借上（かしあげ）」は金融業者（高利貸し）です。"
+      },
+      {
+        id: 4,
+        category: "室町時代",
+        year: "15 追試",
+        question: "室町時代の財政・経済について述べた文として【誤っているもの】を選べ。",
+        options: [
+          "幕府は，諸国に段銭を課して財政基盤を強めた。",
+          "幕府は，高利貸を営む土倉や酒屋への課税を行った。",
+          "幕府は，御家人の所領の質入れや売買を禁止する徳政令を発布した。",
+          "幕府は，貨幣を使った取引の円滑化をはかるため，撰銭令を制定した。"
+        ],
+        answer: 2,
+        explanation: "【正解：③（誤っている記述）】\n御家人の所領の質入れや売買を禁止する徳政令（永仁の徳政令など）を発布したのは「鎌倉幕府」です。室町幕府の徳政令は、土一揆などの要求により、債権・債務の破棄（借金の帳消し）を命じたものです。\n\n【他の選択肢】\n① 正しい。室町幕府は、守護を通して田地（段別）に課税する「段銭」を徴収しました。\n② 正しい。高利貸しを営む土倉・酒屋に対して営業税（土倉役・酒屋役）を課しました。\n④ 正しい。悪銭の増加に伴う経済混乱を防ぐため、撰銭令を出しました。"
+      },
+      {
+        id: 5,
+        category: "中世の経済",
+        year: "09 追試",
+        question: "空欄 [ ア ]・[ イ ] に入る語句の組合せとして正しいものを選べ。\n「荘園からの年貢の保管・運送などに当たっていた [ ア ] が，しだいに商業活動にも従事するようになった。…鎌倉時代には大陸から大量の [ イ ] などが輸入され，広く流通した。」",
+        options: [
+          "ア：借上　　イ：宋銭",
+          "ア：借上　　イ：明銭",
+          "ア：問丸　　イ：宋銭",
+          "ア：問丸　　イ：明銭"
+        ],
+        answer: 2,
+        explanation: "【正解：③】\nア（問丸）：荘園からの年貢の保管・運送にあたっていたのは「問丸」です。彼らは次第に商人化していきました。借上は金融業者です。\nイ（宋銭）：鎌倉時代に平清盛の日宋貿易などを通じて大量に輸入され、流通したのは「宋銭」です。明銭（永楽通宝など）が多く流通するのは室町時代です。"
+      },
+      {
+        id: 6,
+        category: "中世の経済",
+        year: "11 本試",
+        question: "中世における経済・産業の展開について述べた文として【誤っているもの】を選べ。",
+        options: [
+          "多収穫が見込める大唐米が普及した。",
+          "蝦夷地の産物が俵物として長崎から輸出された。",
+          "連雀商人などが各地で行商をした。",
+          "酒屋・土倉が高利貸を行った。"
+        ],
+        answer: 1,
+        explanation: "【正解：②（誤っている記述）】\n蝦夷地の海産物（いりこ・ほしあわび・ふかのひれ）が「俵物（たわらもの）」として長崎から中国（清）へ輸出されたのは、「江戸時代」の中期以降です。中世の話ではありません。\n\n【他の選択肢】\n① 正しい。鎌倉・室町期には、日照りに強く多収穫の大唐米（赤米）が伝来し、西日本を中心に普及しました。\n③ 正しい。連雀商人（れんじゃくしょうにん）や振売などの行商人が活動しました。\n④ 正しい。酒屋や土倉は、元手となる資本を持っていたため、金融業（高利貸し）も営みました。"
+      },
+      {
+        id: 7,
+        category: "江戸時代",
+        year: "12 本試",
+        question: "X・Yの文に関係の深い地名a～dの組合せとして正しいものを選べ。\nX：江戸時代には，米の増産をはかるために，商人資本を活用して開発が行われた。\nY：江戸時代の街道には，宿駅や関所などの施設が設けられた。\n(a:銀座, b:新田, c:大湊, d:一里塚)",
+        options: [
+          "X－a　　Y－c",
+          "X－a　　Y－d",
+          "X－b　　Y－c",
+          "X－b　　Y－d"
+        ],
+        answer: 3,
+        explanation: "【正解：④】\nX（b 新田）：江戸時代、商人資本（町人請負新田）などを活用して盛んに行われた米の増産事業による開発地は「新田」です（例：鴻池善右衛門による河内木綿の新田開発など）。\nY（d 一里塚）：江戸時代の街道（五街道など）に整備されたのは、距離の目安となる「一里塚」や、宿駅（本陣・脇本陣・旅籠屋）です。「大湊」は伊勢湾の港町、「銀座」は銀貨鋳造所です。"
+      },
+      {
+        id: 8,
+        category: "江戸時代",
+        year: "09 本試",
+        question: "（機織り作業場の図版問題）図についての説明として【誤っているもの】を選べ。",
+        options: [
+          "織物を生産する織屋の作業場が描かれている。",
+          "腰かけにすわり，足踏みして布を織る高機が使われている。",
+          "糸繰りから機織りの作業まで，分業体制がとられている。",
+          "この作業場での生産のあり方は，問屋制家内工業とよばれている。"
+        ],
+        answer: 3,
+        explanation: "【正解：④（誤っている記述）】\nこの図は、広い作業場に複数の織機を置き、人を雇って分業で生産を行っている様子、すなわち「工場制手工業（マニュファクチュア）」を描いています。「問屋制家内工業」は、問屋が原料や道具を農家に貸し与え、農家が自宅で生産を行う形態を指すため誤りです。\n\n【他の選択肢】\n図中には「高機（たかばた）」を用いている様子や、糸繰り・機織りの分業の様子が描かれています。"
+      },
+      {
+        id: 9,
+        category: "江戸時代",
+        year: "17 本試",
+        question: "経済先進地であった近世の上方について述べた文として正しいものを選べ。",
+        options: [
+          "京都の豪商である末次平蔵は，富士川や賀茂川の整備を行った。",
+          "元禄期には大坂堂島の十組問屋が，幕府に公認された。",
+          "上方で生産された醬油が，幕末まで江戸の市場を独占した。",
+          "蝦夷地や日本海側の産物が，北前船で上方へ運ばれた。"
+        ],
+        answer: 3,
+        explanation: "【正解：④】\n西廻り航路が整備されると、「北前船（きたまえぶね）」が蝦夷地（昆布・鰊など）や日本海側の産物を、下関を回って瀬戸内海経由で上方（大坂）へ運びました。\n\n【他の選択肢】\n① 誤り。富士川や高瀬川などの水路を開削したのは角倉了以です。末次平蔵は長崎の貿易商（代官）です。\n② 誤り。大坂堂島の十組問屋が幕府に公認されたのは江戸中期以降（享保期など）です。\n③ 誤り。江戸時代前期は上方の醤油（下り醤油）が優勢でしたが、後期になると関東の野田・銚子の「地廻り醤油」が江戸市場を独占するようになりました。"
+      },
+      {
+        id: 10,
+        category: "江戸時代",
+        year: "12 本試",
+        question: "19世紀前半の経済に関して述べた文a～dについて，正しいものの組合せを選べ。\na：商品経済の発達とともに，在郷商人の活動がさかんになった。\nb：商品経済の発達とともに，札差とよばれる村役人の金融活動がさかんになった。\nc：質流れにより，土地を大規模に集積する地主が現れた。\nd：質流れにより，領地を集積する旗本・御家人が増えた。",
+        options: [
+          "a・c",
+          "a・d",
+          "b・c",
+          "b・d"
+        ],
+        answer: 0,
+        explanation: "【正解：① (a・c)】\na 正しい。商品経済の浸透に伴い、農村部で商売を行う「在郷商人」が台頭しました。\nc 正しい。貨幣経済の浸透で困窮した農民が土地を手放し（質流れ）、それを集積した「寄生地主」が現れました。\n\n【誤りの選択肢】\nb 誤り。「札差（ふださし）」は、江戸の浅草に拠点を置き、旗本・御家人の蔵米の受け取りや販売、金融を行った業者です。村役人ではありません。\nd 誤り。旗本・御家人は固定収入（米）に依存していたため、物価上昇で困窮し、借金に苦しんでいました。"
+      },
+      {
+        id: 11,
+        category: "江戸時代",
+        year: "08 本試",
+        question: "近世の産業について述べた文X・Yと，その産物a～dとの組合せとして正しいものを選べ。\nX：九十九里浜で地引網により捕獲されて，綿作などの肥料に加工された。\nY：阿波国（徳島県）でさかんに栽培されて，木綿などの染料に加工された。\n(a:鰊(ニシン), b:鰯(イワシ), c:藍(アイ), d:櫨(ハゼ))",
+        options: [
+          "X－a　　Y－c",
+          "X－a　　Y－d",
+          "X－b　　Y－c",
+          "X－b　　Y－d"
+        ],
+        answer: 2,
+        explanation: "【正解：③】\nX（b 鰯）：九十九里浜などの地引網漁で大量に捕獲され、干鰯（ほしか）や〆粕に加工されて金肥（商品肥料）となったのは「鰯（いわし）」です。鰊（にしん）は蝦夷地（北海道）の特産です。\nY（c 藍）：阿波国（徳島県）で盛んに栽培され、木綿の染料となったのは「藍（あい）」です。櫨（はぜ）は木蝋の原料で、薩摩藩などが有名です。"
+      },
+      {
+        id: 12,
+        category: "江戸時代",
+        year: "14 本試",
+        question: "近世の庶民生活にかかわる諸産業に関して述べた文として正しいものを選べ。",
+        options: [
+          "九十九里浜では鰊漁，土佐では鰯漁などがさかんに行われた。",
+          "瀬戸内海沿岸を中心に，入浜式塩田（入浜塩田）が発達した。",
+          "刈敷や草木灰が，金肥として普及した。",
+          "灘の醤油，阿波の紅花などの特産品が全国各地に生まれた。"
+        ],
+        answer: 1,
+        explanation: "【正解：②】\n瀬戸内海沿岸などでは、干満の差を利用した「入浜塩田」による製塩業が発達しました。\n\n【他の選択肢】\n① 誤り。九十九里浜は鰯漁、蝦夷地が鰊漁です。\n③ 誤り。刈敷や草木灰は自給肥料です。金肥として普及したのは、干鰯・油粕などの購入肥料です。\n④ 誤り。灘・伏見は「酒」の名産地です。醤油は野田・銚子、紅花は出羽（山形）が有名です。"
+      },
+      {
+        id: 13,
+        category: "明治時代",
+        year: "17 本試",
+        question: "明治期の工業に関する文X・Yと，場所a～dとの組合せとして正しいものを選べ。\nX：三菱に払い下げられたこの地の造船所は…日清戦争後の日本の造船業を牽引した。\nY：八幡製鉄所は，この地から産出する鉄鉱石を原材料として利用した。\n(a:兵庫, b:長崎, c:大冶, d:筑豊)",
+        options: [
+          "X－a　　Y－c",
+          "X－a　　Y－d",
+          "X－b　　Y－c",
+          "X－b　　Y－d"
+        ],
+        answer: 2,
+        explanation: "【正解：③】\nX（b 長崎）：三菱に払い下げられ、造船業の中心となったのは官営の「長崎造船所」です。\nY（c 大冶）：八幡製鉄所は、筑豊炭田の石炭と、中国の「大冶（タイヤ）」鉄山の鉄鉱石を利用して操業を開始しました。"
+      },
+      {
+        id: 14,
+        category: "明治時代",
+        year: "02 本試",
+        question: "産業革命期の農村に関して述べた文として【誤っているもの】を選べ。",
+        options: [
+          "地主は，小作料として得た収入を，さまざまな企業の株式に投資するようになり，資本主義経済との結びつきを強めた。",
+          "製糸業の発展につれて繭の輸入が増大したため，養蚕業は衰退した。",
+          "都市人口の増加に対応して米価が上昇し，この時期に米の生産も増大した。",
+          "鉱工業の発展は公害問題を発生させ，足尾銅山の鉱毒被害に対して，田中正造は被害民の救済を求めて天皇への直訴を試みた。"
+        ],
+        answer: 1,
+        explanation: "【正解：②（誤っている記述）】\n明治期、製糸業の発展に伴い、その原料である「繭」の生産（養蚕業）は大いに発展しました。繭を輸入したのではなく、生糸（および絹製品）が当時の日本の主要な輸出品でした。\n\n【他の選択肢】\n① 正しい。寄生地主は小作料収入を株式投資などに回し、資本主義経済の一翼を担いました。\n③ 正しい。都市への人口流入で米の需要が増え、価格が上昇し、土地改良や品種改良で生産も増大しました。\n④ 正しい。足尾銅山鉱毒事件と田中正造の直訴は、明治期の公害問題の代表例です。"
+      },
+      {
+        id: 15,
+        category: "明治時代",
+        year: "11 本試",
+        question: "1880年代後半から1890年代の企業勃興に関して述べた文として【誤っているもの】を選べ。",
+        options: [
+          "民営の鉄道会社がいくつも生まれた。",
+          "多くの紡績会社が設立された。",
+          "コンツェルンの形態による企業の結合が広く見られた。",
+          "一部の工業分野で機械制による生産が広まった。"
+        ],
+        answer: 2,
+        explanation: "【正解：③（誤っている記述）】\n「コンツェルン（持株会社による多角的企業支配）」という形態が確立・普及するのは、第一次世界大戦後から昭和初期にかけてです。1880～90年代は「財閥」の形成期ですが、コンツェルン形態が「広く見られた」とするのは時期尚早です。\n\n【他の選択肢】\n①②④は、企業勃興（1886年頃～）および日清戦後の経営ブーム（1896年頃～）における正しい記述です（日本鉄道会社、大阪紡績会社など）。"
+      },
+      {
+        id: 16,
+        category: "明治時代",
+        year: "10 追試",
+        question: "紡績業に関して述べた文a～dについて，正しいものの組合せを選べ。\na：松方財政の開始以前から，綿糸の生産高が輸入高を上回っていた。\nb：日清戦争ののち数年間，戦争以前に比べて綿糸の輸出高が急増した。\nc：日露戦争ののち，綿糸の生産高は増加傾向にあった。\nd：関税自主権の完全回復にともない，綿糸の輸出高が輸入高を上回るようになった。",
+        options: [
+          "a・c",
+          "a・d",
+          "b・c",
+          "b・d"
+        ],
+        answer: 2,
+        explanation: "【正解：③ (b・c)】\nb 正しい。日清戦争（1894-95）の後、輸出高が急激に伸び、1897年頃に輸入高を上回って純輸出国になっています。\nc 正しい。日露戦争（1904-05）の後も、生産高は右肩上がりで増加しています。\n\n【誤りの選択肢】\na 誤り。松方財政以前（1880年代初頭）は、輸入が生産を上回っています（輸入超過）。\nd 誤り。綿糸の輸出が輸入を上回るのは1897年頃であり、関税自主権の回復（1911年）よりはるか前です。"
+      },
+      {
+        id: 17,
+        category: "大正時代",
+        year: "05 本試",
+        question: "1910年代の工業の発展に関して述べた文X～Zについて，その正誤の組合せとして正しいものを選べ。\nX：猪苗代～東京間の長距離送電に成功した。\nY：工業生産額が大幅に増大し，農業生産額を上回った。\nZ：重化学工業生産額が大幅に増大し，軽工業生産額を上回った。",
+        options: [
+          "X 正　Y 正　Z 誤",
+          "X 正　Y 誤　Z 正",
+          "X 誤　Y 正　Z 誤",
+          "X 誤　Y 誤　Z 正"
+        ],
+        answer: 0,
+        explanation: "【正解：①】\nX 正しい。1914年（大正3年）、猪苗代水力発電所から東京への長距離送電が成功しました。\nY 正しい。第一次世界大戦の好景気（大戦景気）により工業が飛躍的に発展し、1918年頃に工業生産額が農業生産額を上回りました。\nZ 誤り。重化学工業の生産額が軽工業（繊維など）を上回るのは、1930年代（昭和初期）の軍需産業化が進んでからです。1910年代はまだ軽工業が中心でした。"
+      },
+      {
+        id: 18,
+        category: "昭和時代",
+        year: "13 本試",
+        question: "1930年代の経済状況や経済政策に関して述べた文a～dについて，正しいものの組合せを選べ。\na：昭和恐慌によって困窮した農家から欠食児童や女子の身売りが続出して，深刻な社会問題となった。\nb：昭和恐慌による急激なインフレーションを抑制するため，政府は経済安定九原則を発表した。\nc：政府は，国家総動員法に基づいて価格等統制令を公布して公定価格を定め，経済統制を強化した。\nd：政府は，日中戦争における占領地の経済開発のため，日本の紡績企業に在華紡とよばれる国策会社を設立させた。",
+        options: [
+          "a・c",
+          "a・d",
+          "b・c",
+          "b・d"
+        ],
+        answer: 0,
+        explanation: "【正解：① (a・c)】\na 正しい。昭和恐慌（1930年～）により農村は疲弊し、欠食児童や「娘の身売り」が社会問題化しました。\nc 正しい。日中戦争の勃発（1937年）後、国家総動員法（1938年）に基づき、価格等統制令（1939年）を出して公定価格制を導入しました。\n\n【誤りの選択肢】\nb 誤り。経済安定九原則（ドッジ・ラインにつながる）は、第二次世界大戦後の1948年にGHQの指令で出されたインフレ収束策です。\nd 誤り。「在華紡（ざいかぼう）」は、第一次大戦後、日本の紡績会社が中国の安い労働力や市場を求めて独自に進出した現地法人の総称であり、国策会社ではありません。"
+      },
+      {
+        id: 19,
+        category: "昭和時代",
+        year: "14 本試",
+        question: "第一次世界大戦後の日本経済について述べた文として正しいものを選べ。",
+        options: [
+          "金融恐慌に際して，モラトリアム（支払猶予令）が発せられたが，恐慌は沈静化しなかった。",
+          "鈴木商店が経営破綻し，これに巨額の融資を行っていた台湾銀行が経営危機におちいった。",
+          "首相の失言をきっかけに，銀行への取付け騒ぎがおこり，昭和恐慌がはじまった。",
+          "浜口雄幸内閣が断行した金解禁の結果，輸出が増大して景気が回復した。"
+        ],
+        answer: 1,
+        explanation: "【正解：②】\n1927年の金融恐慌では、総合商社の鈴木商店が破綻し、同社に巨額融資をしていた台湾銀行が経営危機（休業）におちいりました。\n\n【他の選択肢】\n① 誤り。高橋是清蔵相によるモラトリアム（支払猶予令）の実施により、取り付け騒ぎは沈静化し、恐慌は収束しました。\n③ 誤り。片岡直温蔵相の失言で始まったのは「金融恐慌（1927）」です。「昭和恐慌（1930）」は、浜口内閣の金解禁が世界恐慌と重なったことで起きました。\n④ 誤り。浜口雄幸内閣による金解禁は、世界恐慌の直撃を招き、輸出が激減して日本経済は深刻な不況（昭和恐慌）に陥りました。"
+      },
+      {
+        id: 20,
+        category: "戦後",
+        year: "00 本試",
+        question: "高度経済成長期以降の農村・農業について述べた文として【誤っているもの】を選べ。",
+        options: [
+          "農家は所得水準を上昇させたが，それは農業以外の収入の増加によるところが大きい。",
+          "アメリカなどの要求にもかかわらず農産物輸入の自由化が実施されなかったため，食糧自給率が高まった。",
+          "青年層の離村が激しくなり，農業従事者の老齢化が深刻な問題となった。",
+          "家電製品や乗用車の普及にみられる消費革命は，農村でも急速に進行した。"
+        ],
+        answer: 1,
+        explanation: "【正解：②（誤っている記述）】\n1961年の農業基本法制定以降、畜産物や果樹などの選択的拡大が進められましたが、飼料穀物や小麦などの農産物輸入は自由化・拡大されました。その結果、日本の食糧自給率は大幅に「低下」しました。\n\n【他の選択肢】\n① 正しい。農業所得の伸び悩みに対し、兼業（会社勤めなど）による農外所得が増加しました。\n③ 正しい。若者の都市流出により、農村では過疎化と農業従事者の高齢化が進みました。\n④ 正しい。農村でも生活様式の近代化が進み、家電や自動車が普及しました。"
+      }
+    ];
+
+    // ランク定義
+    const RANK_TITLES = [
+      { threshold: 0, title: "農民", icon: "🌱" },
+      { threshold: 4, title: "足軽", icon: "🦶" },
+      { threshold: 8, title: "武士", icon: "⚔️" },
+      { threshold: 12, title: "大名", icon: "🏯" },
+      { threshold: 16, title: "老中", icon: "📜" },
+      { threshold: 20, title: "天下人", icon: "👑" },
+    ];
+
+    // 軍師のセリフ集
+    const GUIDE_QUOTES = {
+      correct: [
+        "見事じゃ！その調子で進むがよい！",
+        "うむ、正解じゃ。よくぞ見抜いた！",
+        "天晴れ！歴史の流れがよく見えておる。",
+        "その通り！勝利への道が開けたな。",
+        "やるではないか！次の戦いも期待しておるぞ。"
+      ],
+      incorrect: [
+        "無念…！だが、ここが踏ん張りどころじゃ。",
+        "惜しかったな。だが敗北から学ぶことこそ多し。",
+        "むむっ、間違ったか。解説を読み、知略を磨くのじゃ！",
+        "焦るでない。歴史は一日にして成らず、じゃ。",
+        "次は必ず当てるのじゃ！解説をよく見るのだぞ。"
+      ]
+    };
+
+    // --- メインアプリケーションコンポーネント ---
+
+    function HistoryQuizApp() {
+      const [mode, setMode] = useState('menu'); // menu, practice, list, weakness
+      const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+      const [userAnswers, setUserAnswers] = useState({});
+      const [showExplanation, setShowExplanation] = useState(false);
+      const [shuffledQuestions, setShuffledQuestions] = useState([]);
+      const [score, setScore] = useState(0);
+      const [quizFinished, setQuizFinished] = useState(false);
       
-      // 2. Fisher-Yates shuffle で選択肢をランダムに並び替える
-      for (let i = optionsWithIndex.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [optionsWithIndex[i], optionsWithIndex[j]] = [optionsWithIndex[j], optionsWithIndex[i]];
+      const [wrongQuestions, setWrongQuestions] = useState([]); // 間違えた問題IDのリスト
+      const [guideMessage, setGuideMessage] = useState(""); // 軍師のセリフ
+
+      const getCurrentRank = (currentScore) => {
+        return [...RANK_TITLES].reverse().find(r => currentScore >= r.threshold) || RANK_TITLES[0];
+      };
+      
+      const currentRank = getCurrentRank(score);
+
+      useEffect(() => {
+        // 初期化時に問題をシャッフルしてセット（初回のみ）
+      }, []);
+
+      const resetQuiz = (targetQuestions = questionsData) => {
+        const processedQuestions = targetQuestions.map(q => {
+          // 1. シャッフル前の準備
+          const optionsWithIndex = q.options.map((opt, i) => ({ opt, originalIndex: i }));
+          
+          // 2. Fisher-Yates shuffle
+          for (let i = optionsWithIndex.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [optionsWithIndex[i], optionsWithIndex[j]] = [optionsWithIndex[j], optionsWithIndex[i]];
+          }
+
+          // 3. マップ作成
+          const oldToNew = new Array(optionsWithIndex.length);
+          optionsWithIndex.forEach((item, newIndex) => {
+            oldToNew[item.originalIndex] = newIndex;
+          });
+
+          // 4. シャッフル後の選択肢テキスト配列
+          const newOptions = optionsWithIndex.map(item => item.opt);
+          
+          // 5. 正解のインデックスを更新
+          const newAnswer = optionsWithIndex.findIndex(item => item.originalIndex === q.answer);
+
+          // 6. 解説文の番号置換
+          const numberSymbols = ['①', '②', '③', '④'];
+          const newExplanation = q.explanation.replace(/[①②③④]/g, (match) => {
+            const oldIdx = numberSymbols.indexOf(match);
+            if (oldIdx !== -1 && oldIdx < oldToNew.length) {
+              const newIdx = oldToNew[oldIdx];
+              return numberSymbols[newIdx];
+            }
+            return match;
+          });
+
+          return {
+            ...q,
+            options: newOptions,
+            answer: newAnswer,
+            explanation: newExplanation
+          };
+        });
+
+        const shuffled = processedQuestions.sort(() => Math.random() - 0.5);
+
+        setShuffledQuestions(shuffled);
+        setCurrentQuestionIndex(0);
+        setUserAnswers({});
+        setShowExplanation(false);
+        setScore(0);
+        setQuizFinished(false);
+      };
+
+      const handleAnswer = (optionIndex) => {
+        if (showExplanation) return;
+
+        const currentQ = shuffledQuestions[currentQuestionIndex];
+        const isCorrect = optionIndex === currentQ.answer;
+        
+        setUserAnswers({
+          ...userAnswers,
+          [currentQ.id]: optionIndex
+        });
+
+        if (isCorrect) {
+          setScore(s => s + 1);
+          const msg = GUIDE_QUOTES.correct[Math.floor(Math.random() * GUIDE_QUOTES.correct.length)];
+          setGuideMessage(msg);
+        } else {
+          setWrongQuestions(prev => {
+            if (!prev.includes(currentQ.id)) {
+              return [...prev, currentQ.id];
+            }
+            return prev;
+          });
+          const msg = GUIDE_QUOTES.incorrect[Math.floor(Math.random() * GUIDE_QUOTES.incorrect.length)];
+          setGuideMessage(msg);
+        }
+        
+        setShowExplanation(true);
+      };
+
+      const nextQuestion = () => {
+        if (currentQuestionIndex < shuffledQuestions.length - 1) {
+          setCurrentQuestionIndex(prev => prev + 1);
+          setShowExplanation(false);
+        } else {
+          setQuizFinished(true);
+        }
+      };
+
+      const startWeaknessDrill = () => {
+        const weaknessData = questionsData.filter(q => wrongQuestions.includes(q.id));
+        if (weaknessData.length === 0) return;
+        resetQuiz(weaknessData);
+        setMode('weakness');
+      };
+
+      const getThemeColor = (category) => {
+        if (!category) return "bg-stone-100";
+        if (category.includes("弥生") || category.includes("古代")) return "bg-amber-50"; 
+        if (category.includes("鎌倉") || category.includes("室町") || category.includes("中世")) return "bg-stone-200"; 
+        if (category.includes("江戸") || category.includes("近世")) return "bg-blue-50"; 
+        if (category.includes("明治") || category.includes("大正") || category.includes("昭和") || category.includes("戦後")) return "bg-rose-50"; 
+        return "bg-stone-100";
+      };
+      
+      const getAccentColor = (category) => {
+        if (!category) return "text-stone-600";
+        if (category.includes("弥生")) return "text-amber-700";
+        if (category.includes("鎌倉") || category.includes("室町")) return "text-stone-700";
+        if (category.includes("江戸")) return "text-blue-700";
+        if (category.includes("明治") || category.includes("大正") || category.includes("昭和")) return "text-rose-700";
+        return "text-stone-600";
+      };
+
+      const currentQ = shuffledQuestions[currentQuestionIndex];
+      const progress = shuffledQuestions.length > 0 ? ((currentQuestionIndex) / shuffledQuestions.length) * 100 : 0;
+      const themeBg = currentQ ? getThemeColor(currentQ.category) : "bg-stone-100";
+      const accentColor = currentQ ? getAccentColor(currentQ.category) : "text-stone-600";
+
+      // --- 画面レンダリング ---
+
+      if (mode === 'menu') {
+        return (
+          <div className="min-h-screen bg-stone-50 text-stone-800 font-sans p-6 flex flex-col items-center justify-center">
+            <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 border-t-8 border-red-700 animate-in">
+              <h1 className="text-3xl font-bold text-center mb-2 text-stone-900">日本史B</h1>
+              <h2 className="text-xl font-bold text-center mb-4 text-red-700">社会経済史 演習</h2>
+              
+              <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200 flex items-center justify-center flex-col">
+                <span className="text-xs text-yellow-700 font-bold mb-1">現在の実力（最高ランク）</span>
+                <div className="flex items-center text-2xl font-bold text-yellow-800">
+                  <span className="mr-2 text-3xl">{currentRank.icon}</span>
+                  {currentRank.title}
+                </div>
+                <div className="text-xs text-stone-500 mt-2">
+                  正解数: {score}問 / 次のランクまであと {Math.max(0, RANK_TITLES.find(r => r.threshold > score)?.threshold - score || 0)} 問
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <button 
+                  onClick={() => { resetQuiz(); setMode('practice'); }}
+                  className="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all shadow-md active:scale-95 group"
+                >
+                  <BookOpen className="mr-3 group-hover:scale-110 transition-transform" /> 演習スタート
+                </button>
+
+                <button 
+                  onClick={startWeaknessDrill}
+                  disabled={wrongQuestions.length === 0}
+                  className={`w-full font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all shadow-sm
+                    ${wrongQuestions.length > 0 
+                      ? "bg-indigo-600 hover:bg-indigo-700 text-white active:scale-95" 
+                      : "bg-stone-200 text-stone-400 cursor-not-allowed"}`}
+                >
+                  <Sword className="mr-3" /> 苦手克服「道場」 
+                  {wrongQuestions.length > 0 && <span className="ml-2 bg-white text-indigo-600 px-2 py-0.5 rounded-full text-xs">{wrongQuestions.length}問</span>}
+                </button>
+                
+                <button 
+                  onClick={() => setMode('list')}
+                  className="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all"
+                >
+                  <Award className="mr-3" /> 全問リスト・復習
+                </button>
+              </div>
+            </div>
+          </div>
+        );
       }
 
-      // 3. 元のインデックスが新しい配列のどこに移動したかのマップを作成
-      const oldToNew = new Array(optionsWithIndex.length);
-      optionsWithIndex.forEach((item, newIndex) => {
-        oldToNew[item.originalIndex] = newIndex;
-      });
+      if (mode === 'practice' || mode === 'weakness') {
+        if (quizFinished) {
+          return (
+            <div className={`min-h-screen p-6 flex items-center justify-center ${mode === 'weakness' ? 'bg-indigo-50' : 'bg-stone-50'}`}>
+              <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center relative overflow-hidden animate-in">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-300"></div>
+                
+                <h2 className="text-2xl font-bold mb-4 flex items-center justify-center">
+                  <Scroll className="mr-2" /> 結果発表
+                </h2>
+                
+                <div className="mb-6">
+                  <div className="text-6xl mb-2">{currentRank.icon}</div>
+                  <div className="text-xl font-bold text-stone-600">称号獲得</div>
+                  <div className="text-4xl font-extrabold text-yellow-600 mt-1">{currentRank.title}</div>
+                </div>
 
-      // 4. シャッフル後の選択肢テキスト配列を作成
-      const newOptions = optionsWithIndex.map(item => item.opt);
-      
-      // 5. 正解のインデックスを更新
-      const newAnswer = optionsWithIndex.findIndex(item => item.originalIndex === q.answer);
-
-      // 6. 解説文に含まれる番号（①～④）を新しい配置に合わせて置換
-      const numberSymbols = ['①', '②', '③', '④'];
-      const newExplanation = q.explanation.replace(/[①②③④]/g, (match) => {
-        const oldIdx = numberSymbols.indexOf(match);
-        if (oldIdx !== -1 && oldIdx < oldToNew.length) {
-          const newIdx = oldToNew[oldIdx];
-          return numberSymbols[newIdx];
-        }
-        return match;
-      });
-
-      return {
-        ...q,
-        options: newOptions,
-        answer: newAnswer,
-        explanation: newExplanation
-      };
-    });
-
-    // 問題の出題順をシャッフルする
-    const shuffled = processedQuestions.sort(() => Math.random() - 0.5);
-
-    setShuffledQuestions(shuffled);
-    setCurrentQuestionIndex(0);
-    setUserAnswers({});
-    setShowExplanation(false);
-    setScore(0);
-    setQuizFinished(false);
-  };
-
-  const handleAnswer = (optionIndex) => {
-    if (showExplanation) return;
-
-    const currentQ = shuffledQuestions[currentQuestionIndex];
-    const isCorrect = optionIndex === currentQ.answer;
-    
-    setUserAnswers({
-      ...userAnswers,
-      [currentQ.id]: optionIndex
-    });
-
-    if (isCorrect) {
-      setScore(s => s + 1);
-      // 正解時のセリフをランダム決定
-      const msg = GUIDE_QUOTES.correct[Math.floor(Math.random() * GUIDE_QUOTES.correct.length)];
-      setGuideMessage(msg);
-    } else {
-      // 間違えた場合、苦手リストに追加（重複なし）
-      setWrongQuestions(prev => {
-        if (!prev.includes(currentQ.id)) {
-          return [...prev, currentQ.id];
-        }
-        return prev;
-      });
-      // 不正解時のセリフをランダム決定
-      const msg = GUIDE_QUOTES.incorrect[Math.floor(Math.random() * GUIDE_QUOTES.incorrect.length)];
-      setGuideMessage(msg);
-    }
-    
-    setShowExplanation(true);
-  };
-
-  const nextQuestion = () => {
-    if (currentQuestionIndex < shuffledQuestions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setShowExplanation(false);
-    } else {
-      setQuizFinished(true);
-    }
-  };
-
-  const startWeaknessDrill = () => {
-    const weaknessData = questionsData.filter(q => wrongQuestions.includes(q.id));
-    if (weaknessData.length === 0) return;
-    resetQuiz(weaknessData);
-    setMode('weakness');
-  };
-
-  // 時代ごとの背景テーマを取得
-  const getThemeColor = (category) => {
-    if (!category) return "bg-stone-100";
-    if (category.includes("弥生") || category.includes("古代")) return "bg-amber-50"; 
-    if (category.includes("鎌倉") || category.includes("室町") || category.includes("中世")) return "bg-stone-200"; 
-    if (category.includes("江戸") || category.includes("近世")) return "bg-blue-50"; 
-    if (category.includes("明治") || category.includes("大正") || category.includes("昭和") || category.includes("戦後")) return "bg-rose-50"; 
-    return "bg-stone-100";
-  };
-  
-  const getAccentColor = (category) => {
-    if (!category) return "text-stone-600";
-    if (category.includes("弥生")) return "text-amber-700";
-    if (category.includes("鎌倉") || category.includes("室町")) return "text-stone-700";
-    if (category.includes("江戸")) return "text-blue-700";
-    if (category.includes("明治") || category.includes("大正") || category.includes("昭和")) return "text-rose-700";
-    return "text-stone-600";
-  };
-
-  const currentQ = shuffledQuestions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex) / shuffledQuestions.length) * 100;
-  const themeBg = currentQ ? getThemeColor(currentQ.category) : "bg-stone-100";
-  const accentColor = currentQ ? getAccentColor(currentQ.category) : "text-stone-600";
-
-  // メニュー画面
-  if (mode === 'menu') {
-    return (
-      <div className="min-h-screen bg-stone-50 text-stone-800 font-sans p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 border-t-8 border-red-700">
-          <h1 className="text-3xl font-bold text-center mb-2 text-stone-900">日本史B</h1>
-          <h2 className="text-xl font-bold text-center mb-4 text-red-700">社会経済史 演習</h2>
-          
-          {/* 現在のランク表示（メニュー用） */}
-          <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200 flex items-center justify-center flex-col">
-            <span className="text-xs text-yellow-700 font-bold mb-1">現在の実力（最高ランク）</span>
-            <div className="flex items-center text-2xl font-bold text-yellow-800">
-              <span className="mr-2 text-3xl">{currentRank.icon}</span>
-              {currentRank.title}
-            </div>
-            <div className="text-xs text-stone-500 mt-2">
-              正解数: {score}問 / 次のランクまであと {Math.max(0, RANK_TITLES.find(r => r.threshold > score)?.threshold - score || 0)} 問
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <button 
-              onClick={() => { resetQuiz(); setMode('practice'); }}
-              className="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all shadow-md active:scale-95 group"
-            >
-              <BookOpen className="mr-3 group-hover:scale-110 transition-transform" /> 演習スタート
-            </button>
-
-            <button 
-              onClick={startWeaknessDrill}
-              disabled={wrongQuestions.length === 0}
-              className={`w-full font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all shadow-sm
-                ${wrongQuestions.length > 0 
-                  ? "bg-indigo-600 hover:bg-indigo-700 text-white active:scale-95" 
-                  : "bg-stone-200 text-stone-400 cursor-not-allowed"}`}
-            >
-              <Sword className="mr-3" /> 苦手克服「道場」 
-              {wrongQuestions.length > 0 && <span className="ml-2 bg-white text-indigo-600 px-2 py-0.5 rounded-full text-xs">{wrongQuestions.length}問</span>}
-            </button>
-            
-            <button 
-              onClick={() => setMode('list')}
-              className="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all"
-            >
-              <Award className="mr-3" /> 全問リスト・復習
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 演習モード or 苦手克服モード
-  if (mode === 'practice' || mode === 'weakness') {
-    if (quizFinished) {
-      return (
-        <div className={`min-h-screen p-6 flex items-center justify-center ${mode === 'weakness' ? 'bg-indigo-50' : 'bg-stone-50'}`}>
-          <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-300"></div>
-            
-            <h2 className="text-2xl font-bold mb-4 flex items-center justify-center">
-              <Scroll className="mr-2" /> 結果発表
-            </h2>
-            
-            <div className="mb-6">
-              <div className="text-6xl mb-2">{currentRank.icon}</div>
-              <div className="text-xl font-bold text-stone-600">称号獲得</div>
-              <div className="text-4xl font-extrabold text-yellow-600 mt-1">{currentRank.title}</div>
-            </div>
-
-            <div className="text-5xl font-bold text-red-600 mb-2">
-              {score} / {shuffledQuestions.length}
-            </div>
-            
-            {mode === 'practice' && (
-               <p className="text-stone-500 mb-8">正解率: {Math.round((score / shuffledQuestions.length) * 100)}%</p>
-            )}
-            {mode === 'weakness' && (
-               <p className="text-indigo-600 font-bold mb-8">苦手を {score}問 克服しました！</p>
-            )}
-            
-            <div className="flex gap-3 justify-center">
-              <button 
-                onClick={() => resetQuiz(mode === 'weakness' ? questionsData.filter(q => wrongQuestions.includes(q.id)) : questionsData)}
-                className="flex items-center bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 shadow-md"
-              >
-                <RefreshCw className="mr-2 h-5 w-5" /> もう一度
-              </button>
-              <button 
-                onClick={() => setMode('menu')}
-                className="flex items-center bg-stone-200 text-stone-700 px-6 py-3 rounded-lg hover:bg-stone-300 shadow-md"
-              >
-                メニューへ
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (!currentQ) return <div className="p-10 text-center">Loading...</div>;
-
-    const isAnswered = showExplanation;
-    const userAnswer = userAnswers[currentQ.id];
-    const isUserCorrect = userAnswer === currentQ.answer;
-
-    return (
-      <div className={`min-h-screen md:p-6 p-4 flex flex-col items-center transition-colors duration-500 ${themeBg}`}>
-        {/* Header */}
-        <div className="w-full max-w-2xl flex justify-between items-center mb-4">
-          <button onClick={() => setMode('menu')} className="text-stone-500 hover:text-stone-800 flex items-center bg-white/50 px-3 py-1 rounded-full backdrop-blur-sm">
-            <ArrowLeft className="h-5 w-5 mr-1" /> 中断
-          </button>
-          
-          <div className="flex items-center bg-white/80 px-4 py-1 rounded-full shadow-sm backdrop-blur-sm border border-yellow-200">
-             <span className="text-xl mr-1">{currentRank.icon}</span>
-             <span className="font-bold text-stone-800 text-sm">{currentRank.title}級</span>
-          </div>
-
-          <div className="text-stone-600 font-bold bg-white/50 px-3 py-1 rounded-full backdrop-blur-sm">
-            {mode === 'weakness' ? '特訓' : '問'} {currentQuestionIndex + 1} / {shuffledQuestions.length}
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full max-w-2xl h-2 bg-stone-200/50 rounded-full mb-6 overflow-hidden backdrop-blur-sm">
-          <div 
-            className="h-full bg-red-600 transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        {/* Question Card */}
-        <div className="w-full max-w-2xl bg-white/95 rounded-xl shadow-xl overflow-hidden backdrop-blur-md border border-stone-100">
-          <div className={`p-6 border-b border-stone-100 relative overflow-hidden`}>
-             <div className={`absolute top-0 right-0 p-4 opacity-10 pointer-events-none text-9xl font-serif ${accentColor}`}>
-                {currentQ.category.slice(0,1)}
-             </div>
-
-            <div className="flex justify-between items-start mb-3 relative z-10">
-              <span className={`inline-block px-2 py-1 rounded font-bold text-xs ${accentColor} bg-stone-100`}>
-                {currentQ.category}
-              </span>
-              <span className="text-stone-400 text-xs font-mono">
-                {currentQ.year}
-              </span>
-            </div>
-            <h3 className="text-lg md:text-xl font-medium text-stone-900 leading-relaxed whitespace-pre-wrap relative z-10">
-              {currentQ.question}
-            </h3>
-          </div>
-
-          {/* Options */}
-          <div className="p-4 bg-stone-50/50 space-y-3">
-            {currentQ.options.map((option, index) => {
-              let buttonStyle = "bg-white border-2 border-stone-200 hover:border-red-300 text-stone-700 hover:shadow-md";
-              let icon = null;
-
-              if (isAnswered) {
-                if (index === currentQ.answer) {
-                  buttonStyle = "bg-green-50 border-2 border-green-500 text-green-900 font-bold shadow-sm";
-                  icon = <CheckCircle className="h-5 w-5 text-green-600 ml-auto flex-shrink-0" />;
-                } else if (index === userAnswer) {
-                  buttonStyle = "bg-red-50 border-2 border-red-500 text-red-900 shadow-sm";
-                  icon = <XCircle className="h-5 w-5 text-red-600 ml-auto flex-shrink-0" />;
-                } else {
-                  buttonStyle = "bg-stone-100 border-2 border-transparent text-stone-400 opacity-70";
-                }
-              }
-
-              return (
-                <button
-                  key={index}
-                  onClick={() => handleAnswer(index)}
-                  disabled={isAnswered}
-                  className={`w-full text-left p-4 rounded-lg transition-all flex items-center justify-between group transform ${buttonStyle} ${!isAnswered && "active:scale-[0.99]"}`}
-                >
-                  <span className="flex items-start">
-                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold mr-3 flex-shrink-0 transition-colors ${isAnswered ? 'bg-stone-200 text-stone-500' : 'bg-stone-200 text-stone-600 group-hover:bg-red-100 group-hover:text-red-700'}`}>
-                      {index + 1}
-                    </span>
-                    <span>{option}</span>
-                  </span>
-                  {icon}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* チュートリアル風解説エリア */}
-          {isAnswered && (
-            <div className={`p-6 border-t animate-in fade-in slide-in-from-bottom-4 duration-300 ${isUserCorrect ? "bg-green-50 border-green-100" : "bg-red-50 border-red-100"}`}>
-              {/* 軍師キャラクターとセリフ */}
-              <div className="flex items-start gap-4 mb-4">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 border-2 shadow-sm bg-white ${isUserCorrect ? "border-green-300 text-green-600" : "border-red-300 text-red-600"}`}>
-                   {/* 簡易的な軍師アイコン：Userアイコンに少し装飾的な意味合いを持たせる */}
-                   <div className="relative">
-                      <User size={32} />
-                      <Crown size={14} className="absolute -top-3 -right-2 text-yellow-500 fill-yellow-500" />
-                   </div>
+                <div className="text-5xl font-bold text-red-600 mb-2">
+                  {score} / {shuffledQuestions.length}
                 </div>
                 
-                <div className="flex-1">
-                  <div className={`text-sm font-bold mb-1 ${isUserCorrect ? "text-green-700" : "text-red-700"}`}>
-                    軍師からの助言
-                  </div>
-                  {/* 吹き出し風デザイン */}
-                  <div className="relative bg-white p-3 rounded-xl rounded-tl-none shadow-sm border border-stone-200">
-                    <p className={`font-bold mb-2 ${isUserCorrect ? "text-green-800" : "text-red-800"}`}>
-                      「{guideMessage}」
-                    </p>
-                    <div className="text-stone-700 text-sm leading-relaxed whitespace-pre-wrap border-t border-dashed border-stone-200 pt-2 mt-2">
-                       <div className="flex items-center gap-1 mb-1 text-stone-400 font-bold text-xs uppercase">
-                         <Sparkles size={12} /> Point
-                       </div>
-                       {currentQ.explanation}
-                    </div>
-                  </div>
+                {mode === 'practice' && (
+                   <p className="text-stone-500 mb-8">正解率: {Math.round((score / shuffledQuestions.length) * 100)}%</p>
+                )}
+                {mode === 'weakness' && (
+                   <p className="text-indigo-600 font-bold mb-8">苦手を {score}問 克服しました！</p>
+                )}
+                
+                <div className="flex gap-3 justify-center">
+                  <button 
+                    onClick={() => resetQuiz(mode === 'weakness' ? questionsData.filter(q => wrongQuestions.includes(q.id)) : questionsData)}
+                    className="flex items-center bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 shadow-md"
+                  >
+                    <RefreshCw className="mr-2 h-5 w-5" /> もう一度
+                  </button>
+                  <button 
+                    onClick={() => setMode('menu')}
+                    className="flex items-center bg-stone-200 text-stone-700 px-6 py-3 rounded-lg hover:bg-stone-300 shadow-md"
+                  >
+                    メニューへ
+                  </button>
                 </div>
-              </div>
-              
-              <div className="flex justify-end">
-                <button
-                  onClick={nextQuestion}
-                  className={`px-8 py-3 rounded-full font-bold text-white flex items-center shadow-lg transition-transform hover:scale-105 active:scale-95 ${isUserCorrect ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}
-                >
-                  {currentQuestionIndex < shuffledQuestions.length - 1 ? "次へ進む" : "結果を見る"}
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </button>
               </div>
             </div>
-          )}
-        </div>
-      </div>
-    );
-  }
+          );
+        }
 
-  // リストモード
-  if (mode === 'list') {
-    return (
-      <div className="min-h-screen bg-stone-50 md:p-8 p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center mb-8 sticky top-0 bg-stone-50/95 p-4 rounded-xl z-20 backdrop-blur-sm shadow-sm">
-            <button 
-              onClick={() => setMode('menu')}
-              className="mr-4 p-2 rounded-full hover:bg-stone-200 text-stone-600 transition-colors"
-            >
-              <ArrowLeft />
-            </button>
-            <h1 className="text-2xl font-bold text-stone-800">全問リスト・解説</h1>
-          </div>
+        if (!currentQ) return <div className="p-10 text-center">Loading...</div>;
 
-          <div className="grid gap-6">
-            {questionsData.map((q, i) => (
-              <div key={q.id} className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 transition-all hover:shadow-md">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex gap-2">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${getThemeColor(q.category).replace('bg-', 'bg-').replace('50', '100')} ${getAccentColor(q.category)}`}>
-                      {q.category}
-                    </span>
-                    <span className="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-bold">
-                      Q.{q.id}
-                    </span>
-                    {wrongQuestions.includes(q.id) && (
-                      <span className="bg-indigo-100 text-indigo-600 px-2 py-1 rounded text-xs font-bold flex items-center">
-                        <Sword className="w-3 h-3 mr-1" /> 苦手
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-stone-400 text-xs">{q.year}</span>
-                </div>
+        const isAnswered = showExplanation;
+        const userAnswer = userAnswers[currentQ.id];
+        const isUserCorrect = userAnswer === currentQ.answer;
 
-                <h3 className="text-lg font-medium mb-4 text-stone-900 border-l-4 border-red-700 pl-3">
-                  {q.question}
-                </h3>
-
-                <ul className="space-y-2 mb-4 text-sm text-stone-600 ml-4 list-decimal pl-4">
-                  {q.options.map((opt, idx) => (
-                    <li key={idx} className={`${idx === q.answer ? "font-bold text-red-700" : ""}`}>
-                      {opt} {idx === q.answer && " (正解)"}
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="bg-stone-50 p-4 rounded-lg text-sm text-stone-700 mt-2 flex gap-3">
-                   <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center flex-shrink-0 text-stone-500">
-                      <User size={16} />
-                   </div>
-                   <div>
-                      <span className="font-bold block mb-1 text-stone-500 text-xs">軍師の解説</span>
-                      <div className="whitespace-pre-wrap">{q.explanation}</div>
-                   </div>
-                </div>
+        return (
+          <div className={`min-h-screen md:p-6 p-4 flex flex-col items-center transition-colors duration-500 ${themeBg}`}>
+            {/* Header */}
+            <div className="w-full max-w-2xl flex justify-between items-center mb-4">
+              <button onClick={() => setMode('menu')} className="text-stone-500 hover:text-stone-800 flex items-center bg-white/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                <ArrowLeft className="h-5 w-5 mr-1" /> 中断
+              </button>
+              
+              <div className="flex items-center bg-white/80 px-4 py-1 rounded-full shadow-sm backdrop-blur-sm border border-yellow-200">
+                 <span className="text-xl mr-1">{currentRank.icon}</span>
+                 <span className="font-bold text-stone-800 text-sm">{currentRank.title}級</span>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  return null;
-}
+              <div className="text-stone-600 font-bold bg-white/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                {mode === 'weakness' ? '特訓' : '問'} {currentQuestionIndex + 1} / {shuffledQuestions.length}
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="w-full max-w-2xl h-2 bg-stone-200/50 rounded-full mb-6 overflow-hidden backdrop-blur-sm">
+              <div 
+                className="h-full bg-red-600 transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+
+            {/* Question Card */}
+            <div className="w-full max-w-2xl bg-white/95 rounded-xl shadow-xl overflow-hidden backdrop-blur-md border border-stone-100 animate-in">
+              <div className={`p-6 border-b border-stone-100 relative overflow-hidden`}>
+                 <div className={`absolute top-0 right-0 p-4 opacity-10 pointer-events-none text-9xl font-serif ${accentColor}`}>
+                    {currentQ.category.slice(0,1)}
+                 </div>
+
+                <div className="flex justify-between items-start mb-3 relative z-10">
+                  <span className={`inline-block px-2 py-1 rounded font-bold text-xs ${accentColor} bg-stone-100`}>
+                    {currentQ.category}
+                  </span>
+                  <span className="text-stone-400 text-xs font-mono">
+                    {currentQ.year}
+                  </span>
+                </div>
+                <h3 className="text-lg md:text-xl font-medium text-stone-900 leading-relaxed whitespace-pre-wrap relative z-10">
+                  {currentQ.question}
+                </h3>
+              </div>
+
+              {/* Options */}
+              <div className="p-4 bg-stone-50/50 space-y-3">
+                {currentQ.options.map((option, index) => {
+                  let buttonStyle = "bg-white border-2 border-stone-200 hover:border-red-300 text-stone-700 hover:shadow-md";
+                  let icon = null;
+
+                  if (isAnswered) {
+                    if (index === currentQ.answer) {
+                      buttonStyle = "bg-green-50 border-2 border-green-500 text-green-900 font-bold shadow-sm";
+                      icon = <CheckCircle className="h-5 w-5 text-green-600 ml-auto flex-shrink-0" />;
+                    } else if (index === userAnswer) {
+                      buttonStyle = "bg-red-50 border-2 border-red-500 text-red-900 shadow-sm";
+                      icon = <XCircle className="h-5 w-5 text-red-600 ml-auto flex-shrink-0" />;
+                    } else {
+                      buttonStyle = "bg-stone-100 border-2 border-transparent text-stone-400 opacity-70";
+                    }
+                  }
+
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => handleAnswer(index)}
+                      disabled={isAnswered}
+                      className={`w-full text-left p-4 rounded-lg transition-all flex items-center justify-between group transform ${buttonStyle} ${!isAnswered && "active:scale-[0.99]"}`}
+                    >
+                      <span className="flex items-start">
+                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold mr-3 flex-shrink-0 transition-colors ${isAnswered ? 'bg-stone-200 text-stone-500' : 'bg-stone-200 text-stone-600 group-hover:bg-red-100 group-hover:text-red-700'}`}>
+                          {index + 1}
+                        </span>
+                        <span>{option}</span>
+                      </span>
+                      {icon}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* チュートリアル風解説エリア */}
+              {isAnswered && (
+                <div className={`p-6 border-t animate-in fade-in slide-in-from-bottom-4 duration-300 ${isUserCorrect ? "bg-green-50 border-green-100" : "bg-red-50 border-red-100"}`}>
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 border-2 shadow-sm bg-white ${isUserCorrect ? "border-green-300 text-green-600" : "border-red-300 text-red-600"}`}>
+                       <div className="relative">
+                          <User size={32} />
+                          <Crown size={14} className="absolute -top-3 -right-2 text-yellow-500 fill-yellow-500" />
+                       </div>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className={`text-sm font-bold mb-1 ${isUserCorrect ? "text-green-700" : "text-red-700"}`}>
+                        軍師からの助言
+                      </div>
+                      <div className="relative bg-white p-3 rounded-xl rounded-tl-none shadow-sm border border-stone-200">
+                        <p className={`font-bold mb-2 ${isUserCorrect ? "text-green-800" : "text-red-800"}`}>
+                          「{guideMessage}」
+                        </p>
+                        <div className="text-stone-700 text-sm leading-relaxed whitespace-pre-wrap border-t border-dashed border-stone-200 pt-2 mt-2">
+                           <div className="flex items-center gap-1 mb-1 text-stone-400 font-bold text-xs uppercase">
+                             <Sparkles size={12} /> Point
+                           </div>
+                           {currentQ.explanation}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <button
+                      onClick={nextQuestion}
+                      className={`px-8 py-3 rounded-full font-bold text-white flex items-center shadow-lg transition-transform hover:scale-105 active:scale-95 ${isUserCorrect ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}
+                    >
+                      {currentQuestionIndex < shuffledQuestions.length - 1 ? "次へ進む" : "結果を見る"}
+                      <ChevronRight className="ml-2 h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      if (mode === 'list') {
+        return (
+          <div className="min-h-screen bg-stone-50 md:p-8 p-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center mb-8 sticky top-0 bg-stone-50/95 p-4 rounded-xl z-20 backdrop-blur-sm shadow-sm">
+                <button 
+                  onClick={() => setMode('menu')}
+                  className="mr-4 p-2 rounded-full hover:bg-stone-200 text-stone-600 transition-colors"
+                >
+                  <ArrowLeft />
+                </button>
+                <h1 className="text-2xl font-bold text-stone-800">全問リスト・解説</h1>
+              </div>
+
+              <div className="grid gap-6">
+                {questionsData.map((q, i) => (
+                  <div key={q.id} className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 transition-all hover:shadow-md">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex gap-2">
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${getThemeColor(q.category).replace('bg-', 'bg-').replace('50', '100')} ${getAccentColor(q.category)}`}>
+                          {q.category}
+                        </span>
+                        <span className="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-bold">
+                          Q.{q.id}
+                        </span>
+                        {wrongQuestions.includes(q.id) && (
+                          <span className="bg-indigo-100 text-indigo-600 px-2 py-1 rounded text-xs font-bold flex items-center">
+                            <Sword className="w-3 h-3 mr-1" /> 苦手
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-stone-400 text-xs">{q.year}</span>
+                    </div>
+
+                    <h3 className="text-lg font-medium mb-4 text-stone-900 border-l-4 border-red-700 pl-3">
+                      {q.question}
+                    </h3>
+
+                    <ul className="space-y-2 mb-4 text-sm text-stone-600 ml-4 list-decimal pl-4">
+                      {q.options.map((opt, idx) => (
+                        <li key={idx} className={`${idx === q.answer ? "font-bold text-red-700" : ""}`}>
+                          {opt} {idx === q.answer && " (正解)"}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="bg-stone-50 p-4 rounded-lg text-sm text-stone-700 mt-2 flex gap-3">
+                       <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center flex-shrink-0 text-stone-500">
+                          <User size={16} />
+                       </div>
+                       <div>
+                          <span className="font-bold block mb-1 text-stone-500 text-xs">軍師の解説</span>
+                          <div className="whitespace-pre-wrap">{q.explanation}</div>
+                       </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return null;
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<HistoryQuizApp />);
+  </script>
+</body>
+</html>
